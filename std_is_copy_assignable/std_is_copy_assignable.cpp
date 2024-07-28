@@ -20,7 +20,8 @@ public:
 
 int main()
 {
-    std::cout << "Demonstration of std::is_copy_assignable, is_nothrow_copy_assignable and is_trivially_copy_assignable in C++ ... \n\n";
+    std::cout << "Demonstration of std::is_copy_assignable, is_nothrow_copy_assignable and is_trivially_copy_assignable"
+        " in C++ ... \n\n";
 
     // Class1 has copy assignable operator deleted so output will be false.
     std::cout << "Class1 is_copy_assignable: " << std::boolalpha << std::is_copy_assignable_v<Class1> << std::endl;
