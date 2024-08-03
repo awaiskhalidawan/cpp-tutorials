@@ -9,9 +9,11 @@
 std::optional<std::string> createString(const bool create)
 {
     if (create) {
+        // Create and return a string from a function.
         return "A quick brown fox jumps over a lazy dog. ";
     }
 
+    // Return a 'nullopt' which means that no value is returned from the function.
     return std::nullopt;
 }
 
@@ -31,5 +33,6 @@ int main()
 
     return 0;
 }
+
 
 
