@@ -32,6 +32,33 @@ int main()
         it = 10;
         std::cout << it << " ";
     }
+    std::cout << std::endl;
+
+    // Creating subspans from span.
+    // Create an array of N * S size.
+    constexpr uint16_t N = 3;
+    constexpr uint16_t S = 5;
+    uint32_t data[N * S] = { 0 };
+
+    // Create a span over data array.
+    std::span<uint32_t> dataSpan(data);
+
+    // Create total of S subspans each of size N.
+    std::vector <std::span<uint32_t>> spanList;
+    for (uint32_t i = 0; i < (N * S); i+=N) {
+        auto subspan = dataSpan.subspan(i, N);
+        spanList.push_back(subspan);
+    }
+
+    // Iterate over each span from span list and print the span.
+    uint32_t c = 0;
+    for (auto &span : spanList) {
+        ++c;
+        for (auto& it : span) {
+            it = c;
+            std::cout << it << " ";
+        }
+    }
 
     std::cout << std::endl;
 
