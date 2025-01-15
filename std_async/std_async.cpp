@@ -7,34 +7,48 @@ using namespace std::literals;
 
 uint32_t doSomeWork()
 {
-    //std::cout << "Work started by thread id: " << std::this_thread::get_id() << std::endl;
+    std::cout << "Worker Thread (" << std::this_thread::get_id() << ") Starting work ... " << std::endl;
 
     for (uint16_t i = 0; i < 10; i++) {
-        //std::cout << "Doing work. Thread id: " << std::this_thread::get_id() << std::endl;
+        std::cout << "Worker Thread (" << std::this_thread::get_id() << ") Doing work ... " << std::endl;
         std::this_thread::sleep_for(500ms);
     }
     
-    std::cout << "Work completed from thread id: " << std::this_thread::get_id() << std::endl;
-    return 3;
+    std::cout << "Worker Thread (" << std::this_thread::get_id() << ") Completed work ... " << std::endl;
+
+    // Return some value.
+    return 4;
 }
 
 int main()
 {
-    std::cout << "Hello World from main(). Thread Id: " << std::this_thread::get_id() << std::endl;
+    std::cout << "Demonstration of std::async in C++" << std::endl << std::endl;
 
-    std::vector<std::future<uint32_t>> res;
+    // Launch a task on separate thread. (Launch policy: async)
+    std::cout << "Main thread (" << std::this_thread::get_id() <<"): Launching task with launch policy 'async'. " << std::endl;
 
-    // Launch 20 different async tasks.
-    for (uint16_t i = 0; i < 20; i++) {
-        res.push_back(std::move(std::async(std::launch::async, doSomeWork)));
-    }
+    std::future<uint32_t> res1 = std::async(std::launch::async, doSomeWork);
 
-    while (true) {
-        for (uint16_t i = 0; i < 20; i++) {
-            auto future_res = res.at(i).wait_for(std::chrono::duration<double>(1000ms));
-            std::cout << static_cast<int>(future_res) << std::endl;
-        }
-    }
+    // Wait for the task to complete. The value returned by the task will be obtained via 'get' function of std::future.
+    uint32_t ret_val = res1.get();
+
+    // Print the result returned by the task.
+    std::cout << "Main thread (" << std::this_thread::get_id() << "): Async task returned value: " << ret_val << std::endl << std::endl;
+
+    std::this_thread::sleep_for(1000ms);
+
+    // Launch a task on the same thread i.e. main thread. (Launch policy: deferred)
+    std::cout << "Main thread (" << std::this_thread::get_id() << "): Launching task with launch policy 'deferred'. " << std::endl;
+
+    std::future<uint32_t> res2 = std::async(std::launch::deferred, doSomeWork);
+
+    // Wait for the task to complete. The value returned by the task will be obtained via 'get' function of std::future.
+    ret_val = res2.get();
+
+    // Print the result returned by the task.
+    std::cout << "Main thread (" << std::this_thread::get_id() << "): Async task returned value: " << ret_val << std::endl << std::endl;
 
     return 0;
 }
+
+
