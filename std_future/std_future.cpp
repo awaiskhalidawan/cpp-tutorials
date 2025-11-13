@@ -35,7 +35,8 @@ int main()
         std::future_status op_status = fut.wait_for(std::chrono::milliseconds(1000));
         if (op_status == std::future_status::ready) {
             // The future object has received the signal from std::promise object. The result can be consumed.
-            std::cout << "[Main thread]: The background operation has been completed. The value returned is: " << fut.get() << std::endl;
+            std::cout << "[Main thread]: The background operation has been completed. The value returned is: " << fut.get() 
+                      << std::endl;
             break;
         }
         
