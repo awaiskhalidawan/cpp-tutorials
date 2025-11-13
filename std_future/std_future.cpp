@@ -15,17 +15,24 @@ int main()
 
     // Create a background thread which will perform some async operations and producer a result via std::promise object.
     std::jthread worker = std::jthread([&prom]() -> void {
-        std::cout << "[Worker thread]: Starting a worker thread. " << std::endl;
-        for (int i = 0; i < 5; i++) {
-            // Do some work ...
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+        try {
+            std::cout << "[Worker thread]: Starting a worker thread. " << std::endl;
+            for (int i = 0; i < 5; i++) {
+                // Do some work ...
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+
+            std::cout << "[Worker thread]: Exiting the worker thread. " << std::endl;
+
+            // Produce the result via std::promise object. The signal to std::future object will be generated once the thread 
+            // is exited.
+            prom.set_value_at_thread_exit(100);
         }
-
-        std::cout << "[Worker thread]: Exiting the worker thread. " << std::endl;
-
-        // Produce the result via std::promise object. The signal to std::future object will be generated once the thread 
-        // is exited.
-        prom.set_value_at_thread_exit(100);
+        catch (...) {
+            // Produce the exception via std::promise object. The signal to std::future object will be generated once the thread 
+            // is exited.
+            prom.set_exception_at_thread_exit(std::current_exception());
+        }
     });
     
 
@@ -34,9 +41,14 @@ int main()
     while (true) {
         std::future_status op_status = fut.wait_for(std::chrono::milliseconds(1000));
         if (op_status == std::future_status::ready) {
-            // The future object has received the signal from std::promise object. The result can be consumed.
-            std::cout << "[Main thread]: The background operation has been completed. The value returned is: " << fut.get() 
-                      << std::endl;
+            try {
+                // The future object has received the signal from std::promise object. The result can be consumed.
+                std::cout << "[Main thread]: The background operation has been completed. The value returned is: " << fut.get()
+                    << std::endl;
+            }
+            catch (const std::exception& ex) {
+                std::cout << "Exception received while consuming the result from std::future object: " << ex.what() << std::endl;
+            }
             break;
         }
         
