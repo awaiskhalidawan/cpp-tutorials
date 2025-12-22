@@ -2,18 +2,20 @@
 #include <thread>
 #include <chrono>
 
-// A structure containing different counters. The structure is aligned to cache line but counters share 
-// the SAME cache line. std::hardware_destructive_interference_size is a constant in C++ library which 
-// defines the CACHE line size on the current system which is 64 bytes.
+// A structure containing different counters. The structure is aligned to cache line size which means that 
+// the structure memory address will be multiple of cache line size (64). This also means that the counters
+// share the SAME cache line. std::hardware_destructive_interference_size is a constant in C++ library which 
+// defines the CACHE line size on the current system which is 64 bytes on modern 64-bit architectures.
 struct alignas(std::hardware_destructive_interference_size) SameCacheLineCounters
 {
     std::atomic<uint64_t> counter1 {0};
     std::atomic<uint64_t> counter2 {0};
 };
 
-// A structure containing different counters. The structure is aligned to cache line but each counter is
-// present on DIFFERENT cache line. std::hardware_destructive_interference_size is a constant in C++ library 
-// which defines the CACHE line size on the current system which is 64 bytes.
+// A structure containing different counters. The structure may or may not be be aligned to cache line size
+// because alignment is not mentioned while defining the structure. Each individual counters in the structure
+// are cache aligned because alignment is mentioned while defining the counters. It means that that each counter 
+// share the DIFFERENT cache lines.
 struct DifferentCacheLineCounters
 {
     alignas(std::hardware_destructive_interference_size) std::atomic<uint64_t> counter1 {0};
